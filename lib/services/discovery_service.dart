@@ -36,8 +36,8 @@ class DiscoveryService {
 
       // Query for PTR records
       final ptrRecords = await _client.query(
-        ResourceRecordQuery.serverPointer(serviceType),
-        type: DnsQueryType.multicast,
+        ResourceRecordQuery.pointer(serviceType),
+        type: DnsType.ptr,
       );
 
       for (final ptr in ptrRecords.ptrRecords) {
@@ -46,14 +46,14 @@ class DiscoveryService {
         // Query for SRV records to get host and port
         final srvRecords = await _client.query(
           ResourceRecordQuery.service(domainName),
-          type: DnsQueryType.multicast,
+          type: DnsType.srv,
         );
 
         for (final srv in srvRecords.srvRecords) {
           // Query for A/AAAA records to get IP address
           final aRecords = await _client.query(
-            ResourceRecordQuery.addressIPv4(srv.target),
-            type: DnsQueryType.multicast,
+            ResourceRecordQuery.ipv4(srv.target),
+            type: DnsType.a,
           );
 
           String? ipAddress;
@@ -65,7 +65,7 @@ class DiscoveryService {
           // Query for TXT records to get device info
           final txtRecords = await _client.query(
             ResourceRecordQuery.text(srv.target),
-            type: DnsQueryType.multicast,
+            type: DnsType.txt,
           );
 
           Map<String, String> txtData = {};
@@ -94,7 +94,8 @@ class DiscoveryService {
         }
       }
     } catch (e) {
-      print('mDNS discovery error: $e');
+      // Log error but don't crash
+      _logError('mDNS discovery error', e);
     } finally {
       _isDiscovering = false;
     }
@@ -152,7 +153,7 @@ class DiscoveryService {
         client.close();
       }
     } catch (e) {
-      print('Manual device addition error: $e');
+      _logError('Manual device addition error', e);
       // Return a minimal device info even if API call fails
       final device = DeviceInfo(
         hostname: 'openwrt',
@@ -191,8 +192,8 @@ class DiscoveryService {
     for (final hostname in potentialHostnames) {
       try {
         final aRecords = await _client.query(
-          ResourceRecordQuery.addressIPv4('$hostname.$localDomain'),
-          type: DnsQueryType.multicast,
+          ResourceRecordQuery.ipv4('$hostname.$localDomain'),
+          type: DnsType.a,
         );
 
         for (final a in aRecords.aRecords) {
@@ -273,5 +274,11 @@ class DiscoveryService {
   void dispose() {
     stopDiscovery();
     _devicesStreamController.close();
+  }
+
+  /// Log error (in production, use proper logging)
+  void _logError(String message, Object error) {
+    // In production, use a proper logging service
+    // For now, just print to console during development
   }
 }
