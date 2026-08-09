@@ -1,29 +1,39 @@
 ```
-# Gradle
-.gradle/
-build/
-target/
-
-# Android
+# Build artifacts
 *.apk
-*.aar
-*.dex
-local.properties
-gradle-wrapper.jar
+*.aab
+build/
+dist/
 
-# Kotlin
-*.kotlin_metadata
-
-# Temporary files
-*.tmp
-*.temp
-*~
+# Dependencies
+node_modules/
+vendor/
 
 # Logs
 *.log
+**/logs/
 
 # Environment
 .env
 .env.local
 .env.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+*.coverage
+
+# Temporary files
+*.tmp
+*.temp
 ```

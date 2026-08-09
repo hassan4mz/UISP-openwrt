@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../services/services.dart';
-import '../../l10n/app_localizations.dart';
 
 /// Screen for manually adding a device by IP or MAC address
 class AddDeviceScreen extends StatefulWidget {
@@ -66,7 +65,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
 
     try {
       await _discoveryService.addDeviceByMac(_macController.text.trim());
-      
+
       if (mounted) {
         Navigator.pop(context);
       }
@@ -83,11 +82,9 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.addDeviceManually),
+        title: const Text('Add Device Manually'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -102,25 +99,24 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l10n.enterIpAddress,
-                        style: Theme.of(context).textTheme.titleMedium,
+                      const Text(
+                        'Enter IP Address',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _ipController,
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'IP Address',
                           hintText: '192.168.99.1',
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.dns),
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.dns),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter an IP address';
                           }
-                          // Basic IP validation
                           final ipRegex = RegExp(r'^(\d{1,3}\.){3}\d{1,3}$');
                           if (!ipRegex.hasMatch(value)) {
                             return 'Invalid IP address format';
@@ -132,10 +128,10 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                       TextFormField(
                         controller: _tokenController,
                         obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: l10n.setupPassword,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.lock),
+                        decoration: const InputDecoration(
+                          labelText: 'Setup Password (optional)',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.lock),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -149,7 +145,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : Text(l10n.connectToDevice),
+                              : const Text('Connect to Device'),
                         ),
                       ),
                     ],
@@ -165,24 +161,23 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l10n.enterMacAddress,
-                        style: Theme.of(context).textTheme.titleMedium,
+                      const Text(
+                        'Enter MAC Address',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _macController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'MAC Address',
                           hintText: 'AA:BB:CC:DD:EE:FF',
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.devices),
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.devices),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a MAC address';
                           }
-                          // Basic MAC validation
                           final macRegex = RegExp(r'^([0-9A-Fa-f]{2}[:-]?){5}[0-9A-Fa-f]{2}$');
                           if (!macRegex.hasMatch(value)) {
                             return 'Invalid MAC address format';
@@ -201,7 +196,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : Text(l10n.connectToDevice),
+                              : const Text('Connect to Device'),
                         ),
                       ),
                     ],

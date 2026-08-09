@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../models/models.dart';
 import '../services/services.dart';
-import '../l10n/app_localizations.dart';
 import 'device_detail_screen.dart';
 import 'add_device_screen.dart';
 import 'qr_scan_screen.dart';
@@ -53,21 +51,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        title: const Text('OpenWrt Setup'),
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: () => _navigateToQrScan(),
-            tooltip: l10n.scanQrCode,
+            tooltip: 'Scan QR Code',
           ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => _navigateToAddDevice(),
-            tooltip: l10n.addDeviceManually,
+            tooltip: 'Add Device Manually',
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -78,18 +74,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'troubleshooting',
-                child: Text(l10n.troubleshooting),
-              ),
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: 'troubleshooting', child: Text('Troubleshooting')),
             ],
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: _startDiscovery,
-        child: _buildBody(l10n),
+        child: _buildBody(),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _isDiscovering ? null : _startDiscovery,
@@ -100,14 +93,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.refresh),
-        label: Text(_isDiscovering ? l10n.connecting : l10n.scanForDevices),
+        label: Text(_isDiscovering ? 'Scanning...' : 'Scan for Devices'),
       ),
     );
   }
 
-  Widget _buildBody(AppLocalizations l10n) {
+  Widget _buildBody() {
     if (_devices.isEmpty && !_isDiscovering) {
-      return _buildEmptyState(l10n);
+      return _buildEmptyState();
     }
 
     return ListView.builder(
@@ -115,12 +108,12 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final device = _devices[index];
-        return _buildDeviceCard(device, l10n);
+        return _buildDeviceCard(device);
       },
     );
   }
 
-  Widget _buildEmptyState(AppLocalizations l10n) {
+  Widget _buildEmptyState() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -134,13 +127,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              l10n.noDevicesFound,
+              'No Devices Found',
               style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              l10n.noDevicesFoundMessage,
+              'Make sure your device is powered on and connected to the same network.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -150,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton.icon(
               onPressed: _navigateToAddDevice,
               icon: const Icon(Icons.add),
-              label: Text(l10n.addDeviceManually),
+              label: const Text('Add Device Manually'),
             ),
           ],
         ),
@@ -158,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDeviceCard(DeviceInfo device, AppLocalizations l10n) {
+  Widget _buildDeviceCard(DeviceInfo device) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(

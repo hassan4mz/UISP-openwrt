@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
 
 /// Troubleshooting screen with helpful tips
 class TroubleshootingScreen extends StatelessWidget {
@@ -7,11 +6,9 @@ class TroubleshootingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.troubleshootingTitle),
+        title: const Text('Troubleshooting'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -19,36 +16,43 @@ class TroubleshootingScreen extends StatelessWidget {
           _buildTipCard(
             context,
             Icons.wifi,
-            l10n.troubleshootingConnectWifi,
-            l10n.troubleshootingConnectWifiMessage,
+            'Connect to Setup WiFi',
+            'Make sure your device is connected to the OpenWrt setup WiFi network or the same LAN.',
           ),
           const SizedBox(height: 12),
           _buildTipCard(
             context,
             Icons.signal_cellular_off,
-            l10n.troubleshootingDisableMobileData,
-            l10n.troubleshootingDisableMobileDataMessage,
+            'Disable Mobile Data',
+            'Turn off mobile data during setup to ensure the app uses the local WiFi connection.',
           ),
           const SizedBox(height: 12),
           _buildTipCard(
             context,
             Icons.location_on,
-            l10n.troubleshootingLocationPermission,
-            l10n.troubleshootingLocationPermissionMessage,
+            'Enable Location Services',
+            'On Android, location permission is required for WiFi scanning. Please enable location services in your device settings.',
           ),
           const SizedBox(height: 12),
           _buildTipCard(
             context,
-            Icons.visibility_off,
-            l10n.troubleshootingHiddenSsid,
-            l10n.troubleshootingHiddenSsidMessage,
+            Icons.wifi_lock,
+            'Hidden SSID Warning',
+            'If your setup WiFi network is hidden, it may not appear automatically. You will need to manually enter the SSID and password.',
           ),
           const SizedBox(height: 12),
           _buildTipCard(
             context,
             Icons.security,
-            l10n.certificateWarning,
-            l10n.certificateWarningMessage,
+            'Certificate Warning',
+            'OpenWrt devices use self-signed certificates. You may see a security warning - this is normal. Only proceed if you trust the device.',
+          ),
+          const SizedBox(height: 12),
+          _buildTipCard(
+            context,
+            Icons.refresh,
+            'Refresh Discovery',
+            'Pull down on the home screen to refresh the device discovery scan.',
           ),
         ],
       ),
@@ -70,12 +74,12 @@ class TroubleshootingScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.titleSmall,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     message,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../l10n/app_localizations.dart';
 import 'setup_wizard_screen.dart';
 
 /// Device detail screen showing device information and setup options
@@ -11,8 +10,6 @@ class DeviceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(device.hostname.isNotEmpty ? device.hostname : 'OpenWrt Device'),
@@ -22,18 +19,18 @@ class DeviceDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatusCard(l10n),
+            _buildStatusCard(context),
             const SizedBox(height: 16),
-            _buildInfoCard(l10n),
+            _buildInfoCard(context),
             const SizedBox(height: 24),
-            _buildSetupButton(l10n, context),
+            _buildSetupButton(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatusCard(AppLocalizations l10n) {
+  Widget _buildStatusCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -52,7 +49,7 @@ class DeviceDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    device.isSetupComplete ? l10n.setupComplete : l10n.setupPending,
+                    device.isSetupComplete ? 'Setup Complete' : 'Setup Pending',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Text(
@@ -70,7 +67,7 @@ class DeviceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(AppLocalizations l10n) {
+  Widget _buildInfoCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -82,23 +79,23 @@ class DeviceDetailScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Divider(),
-            _buildInfoRow(l10n.deviceHostname, device.hostname),
-            _buildInfoRow(l10n.deviceMac, device.macAddress),
+            _buildInfoRow('Hostname', device.hostname, context),
+            _buildInfoRow('MAC Address', device.macAddress, context),
             if (device.model != null)
-              _buildInfoRow(l10n.deviceModel, device.model!),
+              _buildInfoRow('Model', device.model!, context),
             if (device.openwrtVersion != null)
-              _buildInfoRow(l10n.deviceVersion, device.openwrtVersion!),
+              _buildInfoRow('OpenWrt Version', device.openwrtVersion!, context),
             if (device.ipAddress != null)
-              _buildInfoRow(l10n.deviceIp, device.ipAddress!),
+              _buildInfoRow('IP Address', device.ipAddress!, context),
             if (device.signalStrength != null)
-              _buildInfoRow(l10n.deviceSignal, '${device.signalStrength} dBm'),
+              _buildInfoRow('Signal Strength', '${device.signalStrength} dBm', context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -122,7 +119,7 @@ class DeviceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSetupButton(AppLocalizations l10n, BuildContext context) {
+  Widget _buildSetupButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -135,7 +132,7 @@ class DeviceDetailScreen extends StatelessWidget {
           );
         },
         icon: const Icon(Icons.settings),
-        label: Text(device.isSetupComplete ? 'Configure' : l10n.connectToDevice),
+        label: Text(device.isSetupComplete ? 'Configure' : 'Connect to Device'),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),

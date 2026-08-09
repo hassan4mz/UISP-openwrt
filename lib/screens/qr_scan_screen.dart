@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../services/services.dart';
-import '../../l10n/app_localizations.dart';
+
 
 /// QR code scanning screen for device discovery
 class QrScanScreen extends StatefulWidget {
@@ -24,11 +24,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    // Localization removed
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.scanQrCode),
+        title: const Text('Scan QR Code'),
       ),
       body: Stack(
         children: [
