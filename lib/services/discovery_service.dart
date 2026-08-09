@@ -35,51 +35,56 @@ class DiscoveryService {
       await _client.start();
 
       // Query for PTR records to find services
-      final ptrRecords = await _client.lookup(resourceType: ResourceType.ptr, name: serviceType).toList();
+      final ptrRecords = await _client.lookup('_openwrt-setup._tcp.local').toList();
 
       for (final ptrRecord in ptrRecords) {
-        final domainName = ptrRecord.domain;
+        // Extract domain name from PTR record data
+        final domainName = ptrRecord.data.toString();
         
         // Query for SRV records to get host and port
-        final srvRecords = await _client.lookup(resourceType: ResourceType.srv, name: domainName).toList();
+        final srvRecords = await _client.lookup(domainName).toList();
 
         for (final srvRecord in srvRecords) {
-          final target = srvRecord.target;
-          
-          // Query for A records to get IP address
-          final aRecords = await _client.lookup(resourceType: ResourceType.a, name: target).toList();
+          // Extract target from SRV record data
+          final srvData = srvRecord.data.toString();
+          final parts = srvData.split(' ');
+          if (parts.length >= 4) {
+            final target = parts[3];
+            
+            // Query for A records to get IP address
+            final aRecords = await _client.lookup(target).toList();
 
-          String? ipAddress;
-          for (final aRecord in aRecords) {
-            ipAddress = aRecord.address.toString();
-            break;
-          }
+            String? ipAddress;
+            for (final aRecord in aRecords) {
+              ipAddress = aRecord.data.toString();
+              break;
+            }
 
-          // Query for TXT records to get device info
-          final txtRecords = await _client.lookup(resourceType: ResourceType.txt, name: domainName).toList();
+            // Query for TXT records to get device info
+            final txtRecords = await _client.lookup(domainName).toList();
 
-          Map<String, String> txtData = {};
-          for (final txtRecord in txtRecords) {
-            for (final item in txtRecord.text) {
-              final parts = item.split('=');
-              if (parts.length == 2) {
-                txtData[parts[0]] = parts[1];
+            Map<String, String> txtData = {};
+            for (final txtRecord in txtRecords) {
+              final text = txtRecord.data.toString();
+              final eqIndex = text.indexOf('=');
+              if (eqIndex > 0) {
+                txtData[text.substring(0, eqIndex)] = text.substring(eqIndex + 1);
               }
             }
-          }
 
-          final device = DeviceInfo(
-            hostname: target.replaceAll('.$localDomain', '').replaceAll('.', ''),
-            macAddress: txtData['mac'] ?? txtData['MAC'] ?? '',
-            model: txtData['model'],
-            openwrtVersion: txtData['version'] ?? txtData['openwrt_version'],
-            ipAddress: ipAddress,
-            serviceType: 'mdns',
-          );
+            final device = DeviceInfo(
+              hostname: target.replaceAll('.$localDomain', '').replaceAll('.', ''),
+              macAddress: txtData['mac'] ?? txtData['MAC'] ?? '',
+              model: txtData['model'],
+              openwrtVersion: txtData['version'] ?? txtData['openwrt_version'],
+              ipAddress: ipAddress,
+              serviceType: 'mdns',
+            );
 
-          if (!_discoveredDevices.any((d) => d.macAddress == device.macAddress)) {
-            _discoveredDevices.add(device);
-            _devicesStreamController.add(List.from(_discoveredDevices));
+            if (!_discoveredDevices.any((d) => d.macAddress == device.macAddress)) {
+              _discoveredDevices.add(device);
+              _devicesStreamController.add(List.from(_discoveredDevices));
+            }
           }
         }
       }
@@ -182,10 +187,10 @@ class DiscoveryService {
     // Try to resolve via mDNS
     for (final hostname in potentialHostnames) {
       try {
-        final aRecords = await _client.lookup(resourceType: ResourceType.a, name: '$hostname.$localDomain').toList();
+        final aRecords = await _client.lookup('$hostname.$localDomain').toList();
 
         for (final aRecord in aRecords) {
-          final ipAddress = aRecord.address.toString();
+          final ipAddress = aRecord.data.toString();
           return await addDeviceByIp(ipAddress);
         }
       } catch (e) {

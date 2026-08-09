@@ -1,62 +1,69 @@
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
 # Dependencies
-.pub/
-.buildlog
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-
-# Generated plugin build files
-**/android/**/gradle-wrapper.properties
-**/ios/Flutter/.last_build_id
-
-# Coverage
-coverage/
-
-# Temporary files
-*.tmp
-*.log
-.DS_Store
-Thumbs.db
-
-# Environment variables
+node_modules/
+venv/
+.venv/
 .env
 .env.local
 *.env.*
 
-# IDE specific
-.idea/
-.vscode/
+# Build outputs
+dist/
+build/
+target/
+*.jar
+*.war
+*.class
+
+# Logs and temp files
+*.log
+*.tmp
 *.swp
 *.swo
 
-# Build outputs
-build/
-dist/
-target/
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Python related (if any Python files exist)
-__pycache__/
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
 *.pyc
-*.pyo
-*.pyd
-.pytest_cache/
+__pycache__/
 .mypy_cache/
+.pytest_cache/
 
-# Node related (if any JS/TS files exist)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Compiled binary files
+# Java specific
+.gradle/
 *.class
-*.o
-*.a
-*.obj
-*.out
-*.exe
-*.dll
-*.so
+*.jar
+*.war
+
+# Dart/Flutter specific
+.dart_tool/
+.packages
+.pub-cache/
+pubspec.lock
 
 # Compressed files
 *.zip
