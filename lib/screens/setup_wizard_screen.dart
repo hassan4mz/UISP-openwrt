@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/services.dart';
 
-
 /// Setup wizard for configuring OpenWrt devices
 class SetupWizardScreen extends StatefulWidget {
   final DeviceInfo device;
@@ -59,8 +58,6 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Localization removed
-    
     return Scaffold(
       appBar: AppBar(
         title: Text('Setup ${widget.device.hostname}'),
@@ -71,40 +68,40 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               )
             : null,
       ),
-      body: _buildStepContent(l10n),
-      bottomNavigationBar: _buildBottomBar(l10n),
+      body: _buildStepContent(),
+      bottomNavigationBar: _buildBottomBar(),
     );
   }
 
-  Widget _buildStepContent(AppLocalizations l10n) {
+  Widget _buildStepContent() {
     switch (_currentStep) {
       case 0:
-        return _buildWifiStep(l10n);
+        return _buildWifiStep();
       case 1:
-        return _buildStationStep(l10n);
+        return _buildStationStep();
       case 2:
-        return _buildAdminStep(l10n);
+        return _buildAdminStep();
       case 3:
-        return _buildConfirmStep(l10n);
+        return _buildConfirmStep();
       case 4:
-        return _buildProgressStep(l10n);
+        return _buildProgressStep();
       default:
         return Container();
     }
   }
 
-  Widget _buildWifiStep(AppLocalizations l10n) {
+  Widget _buildWifiStep() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.wifiConfiguration, style: Theme.of(context).textTheme.headlineSmall),
+          Text('WiFi Configuration', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 24),
           TextField(
             controller: _ssidController,
             decoration: InputDecoration(
-              labelText: l10n.ssid,
+              labelText: 'SSID',
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.wifi),
             ),
@@ -114,7 +111,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             controller: _passwordController,
             obscureText: true,
             decoration: InputDecoration(
-              labelText: l10n.password,
+              labelText: 'Password',
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.lock),
             ),
@@ -123,7 +120,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           DropdownButtonFormField<String>(
             value: _security,
             decoration: InputDecoration(
-              labelText: l10n.security,
+              labelText: 'Security',
               border: const OutlineInputBorder(),
             ),
             items: ['WPA2', 'WPA3', 'WPA2/WPA3'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
@@ -131,7 +128,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           ),
           const SizedBox(height: 16),
           SwitchListTile(
-            title: Text(l10n.hiddenSsid),
+            title: const Text('Hidden SSID'),
             value: _hiddenSsid,
             onChanged: (v) => setState(() => _hiddenSsid = v),
           ),
@@ -139,7 +136,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           DropdownButtonFormField<String>(
             value: _countryCode,
             decoration: InputDecoration(
-              labelText: l10n.countryCode,
+              labelText: 'Country Code',
               border: const OutlineInputBorder(),
             ),
             items: ['US', 'GB', 'DE', 'FR', 'SA', 'AE'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
@@ -150,16 +147,16 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  Widget _buildStationStep(AppLocalizations l10n) {
+  Widget _buildStationStep() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.stationConfiguration, style: Theme.of(context).textTheme.headlineSmall),
+          Text('Station Configuration', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 24),
           SwitchListTile(
-            title: Text(l10n.enableStation),
+            title: const Text('Enable Station Mode'),
             value: _enableStation,
             onChanged: (v) => setState(() => _enableStation = v),
           ),
@@ -168,7 +165,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             TextField(
               controller: _stationSsidController,
               decoration: InputDecoration(
-                labelText: l10n.stationSsid,
+                labelText: 'Station SSID',
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -177,7 +174,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               controller: _stationPasswordController,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: l10n.stationPassword,
+                labelText: 'Station Password',
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -187,19 +184,19 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  Widget _buildAdminStep(AppLocalizations l10n) {
+  Widget _buildAdminStep() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.adminConfiguration, style: Theme.of(context).textTheme.headlineSmall),
+          Text('Admin Configuration', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 24),
           TextField(
             controller: _adminPasswordController,
             obscureText: true,
             decoration: InputDecoration(
-              labelText: l10n.adminPassword,
+              labelText: 'Admin Password',
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.admin_panel_settings),
             ),
@@ -209,7 +206,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             controller: _confirmPasswordController,
             obscureText: true,
             decoration: InputDecoration(
-              labelText: l10n.confirmPassword,
+              labelText: 'Confirm Password',
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.lock_outline),
             ),
@@ -218,7 +215,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           TextField(
             controller: _hostnameController,
             decoration: InputDecoration(
-              labelText: l10n.hostname,
+              labelText: 'Hostname',
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.dns),
             ),
@@ -228,7 +225,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  Widget _buildConfirmStep(AppLocalizations l10n) {
+  Widget _buildConfirmStep() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -289,7 +286,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  Widget _buildProgressStep(AppLocalizations l10n) {
+  Widget _buildProgressStep() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -299,7 +296,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             if (_isApplying) ...[
               const CircularProgressIndicator(),
               const SizedBox(height: 24),
-              Text(l10n.applyingConfiguration, style: Theme.of(context).textTheme.titleMedium),
+              Text('Applying Configuration...', style: Theme.of(context).textTheme.titleMedium),
             ] else if (_error != null) ...[
               const Icon(Icons.error, color: Colors.red, size: 64),
               const SizedBox(height: 24),
@@ -312,9 +309,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             ] else ...[
               const Icon(Icons.check_circle, color: Colors.green, size: 64),
               const SizedBox(height: 24),
-              Text(l10n.configurationApplied, style: Theme.of(context).textTheme.titleMedium),
+              Text('Configuration Applied!', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 24),
-              Text('Please reconnect to the new network', textAlign: TextAlign.center),
+              const Text('Please reconnect to the new network', textAlign: TextAlign.center),
             ],
           ],
         ),
@@ -322,7 +319,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  Widget _buildBottomBar(AppLocalizations l10n) {
+  Widget _buildBottomBar() {
     if (_currentStep == 4) return const SizedBox.shrink();
     
     return Padding(
@@ -332,12 +329,12 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           if (_currentStep > 0)
             OutlinedButton(
               onPressed: () => setState(() => _currentStep--),
-              child: Text(l10n.back),
+              child: const Text('Back'),
             ),
           const Spacer(),
           ElevatedButton(
             onPressed: _currentStep == 3 ? _applyConfiguration : () => setState(() => _currentStep++),
-            child: Text(_currentStep == 3 ? l10n.applyConfiguration : l10n.next),
+            child: Text(_currentStep == 3 ? 'Apply Configuration' : 'Next'),
           ),
         ],
       ),
