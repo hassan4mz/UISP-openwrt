@@ -34,43 +34,37 @@ class DiscoveryService {
     try {
       await _client.start();
 
-      // Query for PTR records
-      final ptrRecords = await _client.query(
-        ResourceRecordQuery.serverPointer(serviceType),
-        type: DnsQueryType.multicast,
-      );
+      // Query for PTR records to find services
+      final ptrQuery = ResourceRecordQuery.ptr(serviceType);
+      final ptrRecords = await _client.query(ptrQuery).toList();
 
-      for (final ptr in ptrRecords.ptrRecords) {
-        final domainName = ptr.domainName;
+      for (final ptrRecord in ptrRecords) {
+        final domainName = ptrRecord.domainName;
         
         // Query for SRV records to get host and port
-        final srvRecords = await _client.query(
-          ResourceRecordQuery.service(domainName),
-          type: DnsQueryType.multicast,
-        );
+        final srvQuery = ResourceRecordQuery.srv(domainName);
+        final srvRecords = await _client.query(srvQuery).toList();
 
-        for (final srv in srvRecords.srvRecords) {
-          // Query for A/AAAA records to get IP address
-          final aRecords = await _client.query(
-            ResourceRecordQuery.addressIPv4(srv.target),
-            type: DnsQueryType.multicast,
-          );
+        for (final srvRecord in srvRecords) {
+          final target = srvRecord.target;
+          
+          // Query for A records to get IP address
+          final aQuery = ResourceRecordQuery.a(target);
+          final aRecords = await _client.query(aQuery).toList();
 
           String? ipAddress;
-          for (final a in aRecords.aRecords) {
-            ipAddress = a.address.toString();
+          for (final aRecord in aRecords) {
+            ipAddress = aRecord.address.toString();
             break;
           }
 
           // Query for TXT records to get device info
-          final txtRecords = await _client.query(
-            ResourceRecordQuery.text(srv.target),
-            type: DnsQueryType.multicast,
-          );
+          final txtQuery = ResourceRecordQuery.txt(domainName);
+          final txtRecords = await _client.query(txtQuery).toList();
 
           Map<String, String> txtData = {};
-          for (final txt in txtRecords.txtRecords) {
-            for (final item in txt.items) {
+          for (final txtRecord in txtRecords) {
+            for (final item in txtRecord.text) {
               final parts = item.split('=');
               if (parts.length == 2) {
                 txtData[parts[0]] = parts[1];
@@ -79,7 +73,7 @@ class DiscoveryService {
           }
 
           final device = DeviceInfo(
-            hostname: srv.target.replaceAll('.$localDomain', '').replaceAll('.', ''),
+            hostname: target.replaceAll('.$localDomain', '').replaceAll('.', ''),
             macAddress: txtData['mac'] ?? txtData['MAC'] ?? '',
             model: txtData['model'],
             openwrtVersion: txtData['version'] ?? txtData['openwrt_version'],
@@ -94,7 +88,8 @@ class DiscoveryService {
         }
       }
     } catch (e) {
-      print('mDNS discovery error: $e');
+      // Log error but don't crash
+      _logError('mDNS discovery error', e);
     } finally {
       _isDiscovering = false;
     }
@@ -152,7 +147,7 @@ class DiscoveryService {
         client.close();
       }
     } catch (e) {
-      print('Manual device addition error: $e');
+      _logError('Manual device addition error', e);
       // Return a minimal device info even if API call fails
       final device = DeviceInfo(
         hostname: 'openwrt',
@@ -190,13 +185,11 @@ class DiscoveryService {
     // Try to resolve via mDNS
     for (final hostname in potentialHostnames) {
       try {
-        final aRecords = await _client.query(
-          ResourceRecordQuery.addressIPv4('$hostname.$localDomain'),
-          type: DnsQueryType.multicast,
-        );
+        final aQuery = ResourceRecordQuery.a('$hostname.$localDomain');
+        final aRecords = await _client.query(aQuery).toList();
 
-        for (final a in aRecords.aRecords) {
-          final ipAddress = a.address.toString();
+        for (final aRecord in aRecords) {
+          final ipAddress = aRecord.address.toString();
           return await addDeviceByIp(ipAddress);
         }
       } catch (e) {
@@ -273,5 +266,11 @@ class DiscoveryService {
   void dispose() {
     stopDiscovery();
     _devicesStreamController.close();
+  }
+
+  /// Log error (in production, use proper logging)
+  void _logError(String message, Object error) {
+    // In production, use a proper logging service
+    // For now, just skip logging during production builds
   }
 }

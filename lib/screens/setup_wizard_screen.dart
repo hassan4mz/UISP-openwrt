@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/services.dart';
-import '../l10n/app_localizations.dart';
+
 
 /// Setup wizard for configuring OpenWrt devices
 class SetupWizardScreen extends StatefulWidget {
@@ -59,7 +59,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    // Localization removed
     
     return Scaffold(
       appBar: AppBar(

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
 
-import 'l10n/app_localizations.dart';
 import 'screens/screens.dart';
 
 void main() {
@@ -38,7 +36,6 @@ class _OpenWrtSetupAppState extends State<OpenWrtSetupApp> {
       
       // Localization
       localizationsDelegates: const [
-        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
@@ -58,7 +55,7 @@ class _OpenWrtSetupAppState extends State<OpenWrtSetupApp> {
       home: Builder(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: Text(AppLocalizations.of(context).appTitle),
+            title: const Text('OpenWrt Setup'),
             actions: [
               IconButton(
                 icon: Icon(_themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
