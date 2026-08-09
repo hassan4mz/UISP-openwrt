@@ -35,22 +35,19 @@ class DiscoveryService {
       await _client.start();
 
       // Query for PTR records to find services
-      final ptrQuery = ResourceRecordQuery.ptr(serviceType);
-      final ptrRecords = await _client.query(ptrQuery).toList();
+      final ptrRecords = await _client.lookup(resourceType: ResourceType.ptr, name: serviceType).toList();
 
       for (final ptrRecord in ptrRecords) {
-        final domainName = ptrRecord.domainName;
+        final domainName = ptrRecord.domain;
         
         // Query for SRV records to get host and port
-        final srvQuery = ResourceRecordQuery.srv(domainName);
-        final srvRecords = await _client.query(srvQuery).toList();
+        final srvRecords = await _client.lookup(resourceType: ResourceType.srv, name: domainName).toList();
 
         for (final srvRecord in srvRecords) {
           final target = srvRecord.target;
           
           // Query for A records to get IP address
-          final aQuery = ResourceRecordQuery.a(target);
-          final aRecords = await _client.query(aQuery).toList();
+          final aRecords = await _client.lookup(resourceType: ResourceType.a, name: target).toList();
 
           String? ipAddress;
           for (final aRecord in aRecords) {
@@ -59,8 +56,7 @@ class DiscoveryService {
           }
 
           // Query for TXT records to get device info
-          final txtQuery = ResourceRecordQuery.txt(domainName);
-          final txtRecords = await _client.query(txtQuery).toList();
+          final txtRecords = await _client.lookup(resourceType: ResourceType.txt, name: domainName).toList();
 
           Map<String, String> txtData = {};
           for (final txtRecord in txtRecords) {
@@ -105,7 +101,8 @@ class DiscoveryService {
   Future<DeviceInfo?> addDeviceByIp(String ipAddress, {String? setupToken}) async {
     try {
       // Validate IP address format
-      if (!InternetAddress.tryParse(ipAddress)) {
+      final ipValid = InternetAddress.tryParse(ipAddress) != null;
+      if (!ipValid) {
         throw ArgumentError('Invalid IP address format');
       }
 
@@ -185,8 +182,7 @@ class DiscoveryService {
     // Try to resolve via mDNS
     for (final hostname in potentialHostnames) {
       try {
-        final aQuery = ResourceRecordQuery.a('$hostname.$localDomain');
-        final aRecords = await _client.query(aQuery).toList();
+        final aRecords = await _client.lookup(resourceType: ResourceType.a, name: '$hostname.$localDomain').toList();
 
         for (final aRecord in aRecords) {
           final ipAddress = aRecord.address.toString();

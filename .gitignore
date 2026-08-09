@@ -1,39 +1,83 @@
-```
-# Build artifacts
-*.apk
-*.aab
-build/
-dist/
-
 # Dependencies
-node_modules/
-vendor/
+.pub/
+.buildlog
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
 
-# Logs
-*.log
-**/logs/
+# Generated plugin build files
+**/android/**/gradle-wrapper.properties
+**/ios/Flutter/.last_build_id
 
-# Environment
-.env
-.env.local
-.env.*
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Coverage reports
+# Coverage
 coverage/
-htmlcov/
-*.coverage
 
 # Temporary files
 *.tmp
-*.temp
-```
+*.log
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+build/
+dist/
+target/
+
+# Python related (if any Python files exist)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Node related (if any JS/TS files exist)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled binary files
+*.class
+*.o
+*.a
+*.obj
+*.out
+*.exe
+*.dll
+*.so
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
