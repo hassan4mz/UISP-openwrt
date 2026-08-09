@@ -24,6 +24,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -35,7 +38,15 @@ jobs:
         run: flutter pub get
         
       - name: Generate localization files
-        run: flutter gen-l10n --arb-dir=lib/l10n --output-localization-file=app_localizations.dart --output-class=AppLocalizations
+        run: flutter gen-l10n
+        
+      - name: Create local.properties
+        run: |
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> android/local.properties
+          
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
         
       - name: Analyze project
         run: flutter analyze --no-fatal-infos || true
