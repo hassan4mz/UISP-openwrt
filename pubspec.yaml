@@ -1,0 +1,54 @@
+name: openwrt_setup
+description: A Flutter app for discovering and configuring OpenWrt devices.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # HTTP client
+  http: ^1.1.0
+  dio: ^5.4.0
+  
+  # mDNS discovery
+  multicast_dns: ^0.3.2+6
+  
+  # QR code scanning
+  mobile_scanner: ^3.5.0
+  
+  # Secure storage
+  flutter_secure_storage: ^9.0.0
+  
+  # WiFi management (Android)
+  wifi_iot: ^0.3.15
+  
+  # Location for WiFi scanning
+  geolocator: ^10.1.0
+  
+  # Permission handling
+  permission_handler: ^11.1.0
+  
+  # State management
+  provider: ^6.1.1
+  
+  # UI components
+  cupertino_icons: ^1.0.6
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/
+  
+  generate: true
