@@ -1,41 +1,46 @@
 ```
 # Dependencies
-.dart_tool/
-.build/
-dependencies/
+node_modules/
 
-# Generated code
-lib/generated/
-lib/l10n/app_localizations.dart
+# Logs and temp files
+*.log
+*.tmp
 
-# Build outputs
-build/
-dist/
-
-# Environment variables
+# Environment
 .env
 .env.local
 *.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Logs
+# Build artifacts
+dist/
+build/
+target/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
 *.log
-
-# Temporary files
-*.tmp
+.git*
+!/.gitignore
 .DS_Store
 Thumbs.db
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Package cache
-.pub-cache/
 ```
