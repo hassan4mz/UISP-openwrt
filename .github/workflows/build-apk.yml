@@ -1,93 +1,88 @@
-name: Build APK
-
+name: Build Android APK
 on:
   push:
     branches: [ main, master ]
-    tags: [ 'v*' ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
-
 jobs:
   build:
     name: Build APK
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-        
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-          
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
           cache: true
-          
-      - name: Get dependencies
+      - name: Get Flutter dependencies
         run: flutter pub get
-        
-      - name: Generate localizations
+      - name: Generate localization files
         run: flutter gen-l10n
-        
-      - name: Analyze code
-        run: flutter analyze --no-fatal-infos || true
-        
-      - name: Run tests
+      - name: Analyze project
+        run: flutter analyze
+      - name: Run tests (if any)
         run: flutter test || true
-        
-      - name: Create local.properties
-        run: echo "flutter.sdk=/opt/hostedtoolcache/flutter/stable-3.24.0-x64/flutter" > android/local.properties
-        
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
-        
-      - name: Build debug APK
-        run: flutter build apk --debug
-        
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
-        with:
-          name: app-debug.apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
-          
-      - name: Build release APK and AAB (for tags)
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        continue-on-error: true
+      - name: Create key.properties (for release builds)
         run: |
-          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo $ANDROID_KEYSTORE_BASE64 | base64 -d > android/app/release-keystore.jks
-            cat >> android/key.properties << EOL
-storeFile=release-keystore.jks
-storePassword=$ANDROID_KEYSTORE_PASSWORD
-keyPassword=$ANDROID_KEY_PASSWORD
-keyAlias=$ANDROID_KEY_ALIAS
-EOL
-            flutter build apk --release
-            flutter build appbundle --release
-          else
-            echo "No keystore found, building unsigned release"
-            flutter build apk --release
-            flutter build appbundle --release
-          fi
-          
-      - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=/home/runner/work/openwrt-setup/openwrt-setup/android/app/upload-keystore.jks" >> android/key.properties
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Build Debug APK
+        run: flutter build apk --debug
+      - name: Build Release APK
+        run: flutter build apk --release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Build App Bundle (AAB)
+        run: flutter build appbundle --release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 30
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 90
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Upload App Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-bundle
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 90
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
+          generate_release_notes: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
