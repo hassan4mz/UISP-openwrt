@@ -1,8 +1,0 @@
-name: flutter_gen_runner
-version: 1.0.0
-environment:
-  sdk: ">=2.17.0 <4.0.0"
-dependencies:
-  args: ^2.3.0
-  path: ^1.8.0
-  yaml: ^3.1.0
